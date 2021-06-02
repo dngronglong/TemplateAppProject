@@ -8,7 +8,7 @@ apply plugin: 'img-optimizer'
 android {
     compileSdkVersion build_versions.target_sdk
 //    buildToolsVersion build_versions.build_tools
-    buildToolsVersion '29.0.2'
+    //buildToolsVersion '29.0.2'
 
     defaultConfig {
         applicationId "com.xiaobai.drive"
@@ -113,8 +113,8 @@ dependencies {
     //屏幕适配AutoSize
     implementation 'me.jessyan:autosize:1.1.2'
     //umeng统计
-    implementation 'com.umeng.umsdk:analytics:8.0.2'
-    implementation 'com.umeng.umsdk:common:2.0.2'
+//    implementation 'com.umeng.umsdk:analytics:latest.integration'
+//    implementation 'com.umeng.umsdk:common:latest.integration'
 
     //预加载占位控件
     implementation 'me.samlss:broccoli:1.0.0'

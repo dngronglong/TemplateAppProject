@@ -19,7 +19,6 @@ package com.xiaobai.drive.utils.request;
 
 import android.content.Context;
 
-import com.umeng.analytics.MobclickAgent;
 import com.xiaobai.drive.activity.LoginActivity;
 import com.xiaobai.drive.utils.MMKVUtils;
 import com.xiaobai.drive.utils.XToastUtils;
@@ -69,7 +68,7 @@ public class CookieUtils {
     public static boolean handleLoginSuccess(String cookie) {
         if (!StringUtils.isEmpty(cookie)) {
             XToastUtils.success("登录成功！");
-            MobclickAgent.onProfileSignIn(KEY_PROFILE_CHANNEL, cookie);
+//            MobclickAgent.onProfileSignIn(KEY_PROFILE_CHANNEL, cookie);
             setCookie(cookie);
             return true;
         } else {
@@ -82,7 +81,7 @@ public class CookieUtils {
      * 处理登出的事件
      */
     public static void handleLogoutSuccess() {
-        MobclickAgent.onProfileSignOff();
+//        MobclickAgent.onProfileSignOff();
         //登出时，清除账号信息
         clearCookie();
         XToastUtils.success("登出成功！");

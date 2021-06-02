@@ -18,11 +18,9 @@
 package com.xiaobai.drive.fragment.home;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
-import android.os.Bundle;
-import android.view.KeyEvent;
-import android.view.View;
-import android.widget.Toast;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
@@ -45,6 +43,8 @@ import com.xiaobai.drive.entity.BaseEntity;
 import com.xiaobai.drive.entity.FileItemEntity;
 import com.xiaobai.drive.entity.ImageViewInfo;
 import com.xiaobai.drive.fragment.file.FilesFragment;
+import com.xiaobai.drive.service.DownloadService;
+import com.xiaobai.drive.service.DownloadServiceImpl;
 import com.xiaobai.drive.utils.DemoDataProvider;
 import com.xiaobai.drive.utils.Util;
 import com.xiaobai.drive.utils.XToastUtils;
@@ -65,6 +65,8 @@ import com.xuexiang.xutil.tip.ToastUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import butterknife.BindView;
 import io.reactivex.Observer;
@@ -80,7 +82,7 @@ import static android.view.View.VISIBLE;
  * @since 2019-10-30 00:15
  */
 @Page(anim = CoreAnim.none, name = "主页/文件")
-public class HomeFragment extends BaseFragment {
+public class HomeFragment extends BaseFragment implements DownloadServiceImpl{
 
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
@@ -353,15 +355,15 @@ public class HomeFragment extends BaseFragment {
 //            }, 1000);
         });
         //上拉加载
-        refreshLayout.setOnLoadMoreListener(refreshLayout -> {
+//        refreshLayout.setOnLoadMoreListener(refreshLayout -> {
             // TODO: 2020-02-25 这里只是模拟了网络请求
-            refreshLayout.finishLoadMore();
+            //refreshLayout.finishLoadMore();
 //            refreshLayout.getLayout().postDelayed(() -> {
 //                mNewsAdapter.loadMore(DemoDataProvider.getEmptyFileItem());
 //                refreshLayout.finishLoadMore();
 //            }, 1000);
-            this.getFiles();
-        });
+            //this.getFiles();
+//        });
         refreshLayout.autoRefresh();//第一次进入触发自动刷新，演示效果
     }
 
@@ -376,6 +378,7 @@ public class HomeFragment extends BaseFragment {
             @Override
             public void onNext(@io.reactivex.annotations.NonNull BaseEntity baseEntity) {
                 if (baseEntity.getCode()==0){
+//                    bindService(model.getId(),model.getFileName(),"下载中",model.getFileName());
                     downloadFile(baseEntity.getData().toString(),title,desc,fileName,context);
                 }
             }
@@ -405,6 +408,23 @@ public class HomeFragment extends BaseFragment {
     protected void downloadFile(String url,String title,String desc,String fileName,Context context){
         DownloadManagerUtil downloadManagerUtil=new DownloadManagerUtil(context);
         long id=downloadManagerUtil.download(url, title, desc, fileName);
+        System.out.println("下载文件ID："+id);
+        downloadManagerUtil.queryFileName(id);
+        Timer timer=new Timer();
+        TimerTask timerTask=new TimerTask() {
+            @Override
+            public void run() {
+                System.out.println("1");
+                int i=downloadManagerUtil.getDownloadPercent(id);
+                Log.i("已下载：",i+"");
+                int j[]=downloadManagerUtil.getBytesAndStatus(id);
+                for (int k=0;k<j.length;k++){
+                    System.out.println(j[k]);
+                }
+            }
+        };
+        timer.schedule(timerTask,2000);
+
     }
 
     /**
@@ -482,5 +502,14 @@ public class HomeFragment extends BaseFragment {
             }
         });
 
+    }
+
+    @Override
+    public void bindService(String url, String title, String desc, String fileName) {
+        Intent intent = new Intent(this.getActivity(), DownloadService.class);
+        intent.putExtra(DownloadService.BUNDLE_KEY_DOWNLOAD_URL, url);
+        intent.putExtra("title", title);
+        intent.putExtra("desc", desc);
+        intent.putExtra("fileName", fileName);
     }
 }

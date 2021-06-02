@@ -21,10 +21,9 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <TextView
-        style="@style/TextStyle.Title"
-        android:layout_height="match_parent"
-        android:layout_gravity="center"
-        android:text="@string/nav_transfer" />
-
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 </LinearLayout>

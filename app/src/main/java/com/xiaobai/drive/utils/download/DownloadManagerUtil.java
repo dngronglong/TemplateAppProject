@@ -144,4 +144,38 @@ public class DownloadManagerUtil {
         }
     }
 
+    public int getDownloadPercent(long downloadId){
+        DownloadManager.Query query = new DownloadManager.Query().setFilterById(downloadId);
+        Cursor c =  downloadManager.query(query);
+        if(c.moveToFirst()){
+            int downloadBytesIdx = c.getColumnIndexOrThrow(
+                    DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR);
+            int totalBytesIdx = c.getColumnIndexOrThrow(
+                    DownloadManager.COLUMN_TOTAL_SIZE_BYTES);
+            long totalBytes = c.getLong(totalBytesIdx);
+            long downloadBytes = c.getLong(downloadBytesIdx);
+            return (int) (downloadBytes * 100 / totalBytes);
+        }
+        return 0;
+    }
+
+    public int[] getBytesAndStatus(long downloadId) {
+        int[] bytesAndStatus = new int[] { -1, -1, 0 };
+        DownloadManager.Query query = new DownloadManager.Query().setFilterById(downloadId);
+        Cursor c = null;
+        try {
+            c = downloadManager.query(query);
+            if (c != null && c.moveToFirst()) {
+                bytesAndStatus[0] = c.getInt(c.getColumnIndexOrThrow(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
+                bytesAndStatus[1] = c.getInt(c.getColumnIndexOrThrow(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
+                bytesAndStatus[2] = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS));
+            }
+        } finally {
+            if (c != null) {
+                c.close();
+            }
+        }
+        return bytesAndStatus;
+    }
+
 }
